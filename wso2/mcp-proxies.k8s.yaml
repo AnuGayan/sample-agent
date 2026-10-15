@@ -1,0 +1,37 @@
+# The two MCP proxies, applied straight to the gateway through the WSO2 gateway operator.
+# Agent Manager's console can't register them: its SSRF guard rejects upstreams on private
+# addresses such as host.k3d.internal. These resources skip the console, so they don't
+# appear there.
+#   apply:  kubectl -n default-default apply -f wso2/mcp-proxies.k8s.yaml
+#   remove: kubectl -n default-default delete mcp -l app.kubernetes.io/part-of=sample-agent
+apiVersion: gateway.api-platform.wso2.com/v1
+kind: Mcp
+metadata:
+  name: toolbox-mcp
+  labels:
+    gateway.api-platform.wso2.com/restapi-target: api-platform-default-default
+    app.kubernetes.io/part-of: sample-agent
+spec:
+  displayName: Toolbox MCP
+  version: v1.0
+  context: /toolbox
+  specVersion: "2025-06-18"
+  upstream:
+    url: http://host.k3d.internal:8001/mcp   # full endpoint: the gateway forwards /toolbox/mcp here as-is
+    hostRewrite: auto
+---
+apiVersion: gateway.api-platform.wso2.com/v1
+kind: Mcp
+metadata:
+  name: notes-mcp
+  labels:
+    gateway.api-platform.wso2.com/restapi-target: api-platform-default-default
+    app.kubernetes.io/part-of: sample-agent
+spec:
+  displayName: Notes MCP
+  version: v1.0
+  context: /notes
+  specVersion: "2025-06-18"
+  upstream:
+    url: http://host.k3d.internal:8002/mcp
+    hostRewrite: auto

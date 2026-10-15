@@ -1,0 +1,51 @@
+# WSO2 API Platform gateway 1.2.1 resources (the gateway inside the local Agent Manager).
+# Create the same three things in the Agent Manager / AI Workspace UI using these values;
+# this file is the reference for every field. Upstreams use host.k3d.internal, which is how
+# pods in the amp-local k3d cluster reach this Mac.
+#
+# Clients reach the gateway at http://default-default.gateway.localhost:19080<context>.
+apiVersion: gateway.api-platform.wso2.com/v1
+kind: LlmProvider
+metadata:
+  name: ollama-provider
+spec:
+  displayName: Local Ollama
+  version: v1.0
+  template: openai                  # Ollama serves the OpenAI chat-completions format at /v1
+  context: /ollama
+  upstream:
+    url: http://host.k3d.internal:11434/v1
+    hostRewrite: auto
+  accessControl:
+    mode: deny_all
+    exceptions:
+      - path: /chat/completions
+        methods: [POST]
+      - path: /models
+        methods: [GET]
+---
+apiVersion: gateway.api-platform.wso2.com/v1
+kind: Mcp
+metadata:
+  name: toolbox-mcp
+spec:
+  displayName: Toolbox MCP
+  version: v1.0
+  context: /toolbox
+  specVersion: "2025-06-18"
+  upstream:
+    url: http://host.k3d.internal:8001/mcp   # full endpoint: the gateway forwards /toolbox/mcp here as-is
+    hostRewrite: auto               # the server checks Host; allow it with --allowed-host host.k3d.internal
+---
+apiVersion: gateway.api-platform.wso2.com/v1
+kind: Mcp
+metadata:
+  name: notes-mcp
+spec:
+  displayName: Notes MCP
+  version: v1.0
+  context: /notes
+  specVersion: "2025-06-18"
+  upstream:
+    url: http://host.k3d.internal:8002/mcp
+    hostRewrite: auto

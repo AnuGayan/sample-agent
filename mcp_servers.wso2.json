@@ -1,0 +1,6 @@
+{
+  "mcpServers": {
+    "toolbox": { "url": "${WSO2_GATEWAY_URL}/toolbox/mcp" },
+    "notes": { "url": "${WSO2_GATEWAY_URL}/notes/mcp" }
+  }
+}
